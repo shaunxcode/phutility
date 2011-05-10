@@ -27,6 +27,11 @@ class Invokable {
 
     public static function __callStatic($method, $args) {
         $new = new Invokable;
+		if(strpos($method, 'try_') === 0) {
+			array_unshift($args, substr($method, 4));
+			$method = 'try';
+		}
+		
         $new->addToStack($method, $args); 
         return $new;
     }

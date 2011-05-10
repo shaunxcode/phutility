@@ -4,6 +4,24 @@ namespace Phunderscore;
 class Tryable {
 	private $obj;
 	
+	public static function attemptTryable($obj, $method, $args) {
+		if(strpos($method, 'try_') === 0) {
+			array_unshift($args, substr($method, 4));
+			$method = 'try';
+		}
+		
+		if($method == 'try') {
+			$tryMethod = array_shift($args);
+			if(method_exists($obj, $tryMethod)) {
+				return call_user_func_array(array($obj, $tryMethod), $args);
+			} else {
+				return new Tryable($obj);
+			}
+		}
+		
+		return false;
+	}
+	
 	public function __construct($obj = null) {
 		$this->obj = $obj;
 	}

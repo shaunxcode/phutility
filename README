@@ -15,7 +15,7 @@ without extending any core php objects.
 Obviously this is a tribute to http://documentcloud.github.com/underscore/
 
 However there are some other aspects which are php-centric which do not translate 
-to/from javascript e.g. the Tryable and Invokable classes which are nice utilities
+to/from javascript e.g. Invokable class which is a nice utility
 which you can integrate into collection/entity classes. 
 
 i.e. 
@@ -45,47 +45,3 @@ Which is equivelant to:
 
 $y->callMethod(30);
 $z->callMethod(30);
-
-
-Tryable is a class which just returns itself allowing for risky fluent expressions. It does have
-two methods "else" and "elseThrow".
-
-Tryable::else can be a scalar default argument or an invokable callback which acts further upon the original
-object which was being "try"ed upon. 
-
-Tryable::elseThrow will throw an exception which is passed to it. It can also just be a string which is 
-then thrown into a generic exception. 
-
-Until we have traits Tryable can be integrated into a class in a number of ways but most simply:
-
-use Phunderscore\Tryable;
-
-class Entity extends SomeBaseEntity {
-	public function __call($method, $args) {
-		if($method == 'try') {
-			return $this->_try($args);
-		} 
-	}
-	
-	public function _try($args) {
-		$method = array_shift($args);
-		if(method_exists($this, $method)) {
-			return call_user_func_array(array($this, $method), $args);
-		} else {
-			return new Tryable($this);
-		}
-	}
-}
-
-This allowsfor things such as:
-
-$instanceOfEntity->try('getAge')->else(30);
-
-$instanceOfEntity
-	->try('methodMightWork')
-	->else(I::methodThatWorksBeterer($arg1))
-	->elseThrow(new Exception("Bad things"));
-	
-$instanceOfEntity
-	->try('methodWhichMatters', $arg1, $arg2)
-	->elseThrow('Bad Things');
