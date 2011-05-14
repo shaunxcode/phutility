@@ -12,6 +12,11 @@ class Invokable {
 		return $this->stack;
 	}
 	
+	public function getFirstMethodInStack() {
+		reset($this->stack);
+		return key($this->stack);
+	}
+	
     public function addToStack($method, $args) {
         $this->stack[$method] = $args;
         return $this;

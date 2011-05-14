@@ -1,55 +1,30 @@
 <?php
 namespace Phunderscore;
 
-class Tryable {
-	private $obj;
-	
-	public static function attemptTryable($obj, $method, $args) {
-		if(strpos($method, 'try_') === 0) {
-			array_unshift($args, substr($method, 4));
-			$method = 'try';
-		}
-		
+class Tryable {	
+	public static function attempt($obj, $method, $args) {		
 		if($method == 'try') {
 			$tryMethod = array_shift($args);
-			if(method_exists($obj, $tryMethod)) {
-				return call_user_func_array(array($obj, $tryMethod), $args);
+			$default = empty($args) ? false : array_shift($args);
+			if(is_scalar($tryMethod)) {
+				$i = new Invokable();
+				$i->addToStack($method, array());
+			} else if(is_callable($tryMethod)) {
+				$i = $tryMethod;
 			} else {
-				return new Tryable($obj);
+				throw new \Exception('Expecting either a method name, a closure or an Invokable object');
+			}
+		
+			if(method_exists($obj, $i->getFirstMethodInStack())) {
+				return $i($obj);
+			} else {
+				if($default instanceof \Exception) { 
+					throw new $default;
+				} else {
+					return $default;
+				}
 			}
 		}
-		
 		return false;
-	}
-	
-	public function __construct($obj = null) {
-		$this->obj = $obj;
-	}
-	
-	public function __call($method, $args) {
-		if($method == 'else') {
-			if(is_callable(current($args))) {
-				return call_user_func_array(current($args), array($this->obj));
-			}
-			return current($args);
-		}
-		
-		if($method == 'elseThrow') {
-			$exception = current($args);
-			if(!($exception instanceof \Exception)) {
-				$exception = new \Exception($exception);
-			}
-			throw $exception;
-		}
-		
-		return $this;
-	}
-	
-	public function __get($what) {
-		return $this;
-	}
-	
-	public function __toString() {
-		return '';
 	}
 }

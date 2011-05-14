@@ -1,22 +1,16 @@
-       __                         __                                                 
-      /\ \                       /\ \                                                
- _____\ \ \___   __  __   ___    \_\ \     __  _ __  ____   ___    ___   _ __   __   
-/\ '__`\ \  _ `\/\ \/\ \/' _ `\  /'_` \  /'__`\\`'__\',__\ /'___\ / __`\/\`'__\'__`\ 
-\ \ \L\ \ \ \ \ \ \ \_\ \\ \/\ \/\ \L\ \/\  __/ \ \/\__, `\\ \__//\ \L\ \ \ \/\  __/ 
- \ \ ,__/\ \_\ \_\ \____/ \_\ \_\ \___,_\ \____\ \_\/\____/ \____\ \____/\ \_\ \____\
-  \ \ \/  \/_/\/_/\/___/ \/_/\/_/\/__,_ /\/____/\/_/\/___/ \/____/\/___/  \/_/\/____/
-   \ \_\                                                                             
-    \/_/                                                                             
+       __               __         ___        __                
+      /\ \             /\ \__  __ /\_ \    __/\ \__             
+ _____\ \ \___   __  __\ \ ,_\/\_\\//\ \  /\_\ \ ,_\  __  __    
+/\ '__`\ \  _ `\/\ \/\ \\ \ \/\/\ \ \ \ \ \/\ \ \ \/ /\ \/\ \   
+\ \ \L\ \ \ \ \ \ \ \_\ \\ \ \_\ \ \ \_\ \_\ \ \ \ \_\ \ \_\ \  
+ \ \ ,__/\ \_\ \_\ \____/ \ \__\\ \_\/\____\\ \_\ \__\\/`____ \ 
+  \ \ \/  \/_/\/_/\/___/   \/__/ \/_/\/____/ \/_/\/__/ `/___/> \
+   \ \_\                                                  /\___/
+    \/_/                                                  \/__/ 
 
-phunderscore is a utility-belt library for php that provides 
-support for the usual functional suspects (each, map, reduce, filter...) 
-without extending any core php objects.
-
-Obviously this is a tribute to http://documentcloud.github.com/underscore/
-
-However there are some other aspects which are php-centric which do not translate 
-to/from javascript e.g. Invokable class which is a nice utility
-which you can integrate into collection/entity classes. 
+Phutility is a collection of tools to make life in php more livable. 
+Initially this means Invokable which is a utlity for creating simple 
+callbacks w/o having to define a function. 
 
 i.e. 
 
@@ -26,7 +20,7 @@ $collection->map(function($i) use($var1, $var2) {
 
 Can become: 
 
-use Phunderscore\Invokable as I;
+use Phutility\Invokable as I;
 
 $collection->map(I::someMethod()->someOther($var1)->someOther($var2));
 
@@ -36,12 +30,13 @@ which an anonymous function would other wise.
 
 You could even do things like:
 
-$x = I::callMethod(30);
+$x = I::callMethod(30)->secondMethod($arg2);
 
 $x($y);
 $x($z);
 
 Which is equivelant to:
 
-$y->callMethod(30);
-$z->callMethod(30);
+$y->someMethod(30)->secondMethod($arg2);
+$z->someMethod(30)->secondMethod($arg2);
+
