@@ -1,5 +1,5 @@
 <?php
-namespace Phunderscore;
+namespace Phutility;
 
 class Tryable {	
 	public static function attempt($obj, $method, $args) {		

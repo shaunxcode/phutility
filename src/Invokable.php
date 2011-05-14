@@ -1,5 +1,5 @@
 <?php
-namespace Phunderscore;
+namespace Phutility;
 
 class Invokable { 
     private $stack;
