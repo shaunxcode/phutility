@@ -7,14 +7,16 @@
     \/_/     \/_/\/_/ \/_____/   \/_/  \/_____/ \/___/ \/_____/  \/_/    \/_/
 
 Phutility is a collection of tools to make life in php more livable. 
-Initially this means Invokable which is a utility for creating simple 
-callbacks w/o having to define a function.
+
+http://30.media.tumblr.com/tumblr_l3wek2i9FK1qzev6go1_400.jpg
+
+Invokable is a utility for creating simple callbacks when dealing w/ objects.
 
 $collection->map(function($i) use($var1, $var2) { 
     return $i->someMethod()->someOther($var1)->someOther($var2);
 });
 
-Can become: 
+Becomes:
 
 use Phutility\Invokable as I;
 
@@ -24,20 +26,21 @@ As you may have inferred Invokable is a class which builds up a stack using __ca
 and then further, implements the __invoke method so it may be used in any context
 which an anonymous function would other wise. 
 
-You could even do things like:
+Further:
 
 $x = I::callMethod(30)->secondMethod($arg2);
 
 $x($y);
 $x($z);
 
-Which is equivelant to:
+Which is equivalent to:
 
 $y->someMethod(30)->secondMethod($arg2);
 $z->someMethod(30)->secondMethod($arg2);
 
-Obj is an alternative object model based more upon self (http://selflanguage.org/).
-You can create new objects:
+Obj is an alternative/classless object model based more upon self (http://selflanguage.org/).
+
+Create a new object:
 
 use Phutility\Obj;
 
@@ -61,15 +64,15 @@ $obj->addParent(Obj::create(
 	})
 );
 
-You can also add multiple parents at once:
+You can add multiple parents at once:
 $obj->addParents($parent1, $parent2);
 
-You can "clone" an object, which is essentially how you create an instance in normal oo terms. 
+You can "clone" an object, which is essentially how you create an instance in "classful" oo terms. 
 You can over-ride any properties that you want when creating a clone. 
 
 $otherObj = $obj('age', 40);
 
-The larger question is obviously "why". Well, mainly to explore the limits of class-less oo. 
+The larger question is obviously "why"? Well, mainly to explore the limits of class-less oo. 
 There is a decent potential for cool meta-programming as well. The fact that you can pass 
 around these objects as if they are normal php objects is advantageous in that it does not 
 limit you to staying with in the confines of Phutility\Obj. 
@@ -117,7 +120,7 @@ $red = $color(array('name' => 'Red', 'hex' => '#ff0000'));
 echo $red->getName();
 echo $red->setHex('#ff00ff')->getHex();
 
-The real point is that it looks like an object and acts like an object yet we can
+It is important to note that it looks like an object and acts like an object yet we can
 add new methods at any time. Say we want to allow saving of the object via some sort
 of entity manager. 
 
@@ -129,3 +132,10 @@ $red->save = function($self) {
 };
 
 $red->save();
+
+As you can see it would be relatively trivial to modify the createTableObject to build
+in validation inside of the setter etc.
+
+The Obj class is essentially a meta-object-protocol in that multiple inheritance behavior,
+method dispatch etc. can be customized. One could extend Obj and over-ride the getSlot 
+method to behave in any way that you would like. 

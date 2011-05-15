@@ -11,12 +11,12 @@ use Phutility\Obj;
 use Phutility\Test;
 
 $guy = Obj::create(
-    'name', 'peter', 
-    'age', 30,
+	'name', 'peter', 
+	'age', 30,
 	'region', 'USA',
-    'getAgePlusYears', function($self, $years) {
-        return $self->age + $years;
-    }
+	'getAgePlusYears', function($self, $years) {
+		return $self->age + $years;
+	}
 );
 
 Test::assert("Slot Value is correct", $guy->age, 30);
@@ -45,9 +45,9 @@ $guy->getAgePlusYears = function($self, $years) {
 Test::assert("Overload slot method", $guy->getAgePlusYears(300), 1100); 
 
 $person = Obj::create(
-    'willDieAt', function($self) {
-        return $self->age + 100;
-    }
+	'willDieAt', function($self) {
+		return $self->age + 100;
+	}
 );
 
 $guy->addParent($person); 
@@ -64,14 +64,16 @@ $guy->friends = array(
 		'name', 'ralph')->addParent($person),
 	Obj::create(
 		'age', 50,
-		'name', 'peter')->addParent($person));
+		'name', 'peter')->addParent($person)
+);
 
 Test::assert("Set array as property, check first element", $guy->friends[0]->name, 'ralph');
 Test::assert("Test invokable with obj", array_map(I::willDieAt(), $guy->friends), array(130, 150));
 
 $otherGuy = $guy(
 	'age', 10, 
-	'name', 'sammy');
+	'name', 'sammy'
+);
 
 Test::assert("Cloned object slot is correct", $otherGuy->name, 'sammy');
 Test::assert("Cloned object inherits property", $otherGuy->region, 'USA');
@@ -81,12 +83,12 @@ Test::assert("Object Cloned from is still same", $guy->name, 'peter');
 $number = Obj::create(
 	'value', 0, 
 	'add', function($self, $val) { 
-		$self->value += $val;
-		return $self;
+		return $self->copy('value', $self->value + $val);
 	},
 	'sub', function($self, $val) {
-		$self->value -= $val;	
-	});
+		return $self->copy('value', $self->value - $val);	
+	}
+);
 
 $five = $number('value', 5);
 
@@ -95,12 +97,12 @@ Test::assert("Adding number", $five->add(10)->value, 15);
 
 $five->{"double" . ucfirst('value')} = function($self) { return $self->value * 2; };
 
-Test::assert("double the value?", $five->doubleValue(), 30);
+Test::assert("double the value?", $five->doubleValue(), 10);
 
 function createTableObject($name, $fields) {
 	$obj = Obj::create(
 		'table', $name,
-	    'data', array(),
+		'data', array(),
 		'types', array());
 	
 	$buildGetter = function($fname) { 
@@ -136,4 +138,5 @@ Test::assert('higher order setter', $red->setName('Crimson')->getName(), 'Crimso
 
 Test::assert('instantiated w/ array', Obj::create(array('a' => 'b', 'c' => 'd'))->a, 'b');
 Test::assert('instantiated w/o array', Obj::create('a', 'b', 'c', 'd')->a, 'b');
+
 Test::totals();

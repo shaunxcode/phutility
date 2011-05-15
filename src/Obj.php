@@ -25,10 +25,14 @@ class Obj {
 		}
     }
 
-	public function __invoke() {
+	public function copy() {
 		$new = new Obj(func_get_args(), $this->slots);
 		call_user_func_array(array($new, 'addParents'), $this->parents);
 		return $new;
+	}
+	
+	public function __invoke() {
+		return call_user_func_array(array($this, 'copy'), func_get_args());
 	}
 	
     public function addParent($parent) {
