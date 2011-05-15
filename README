@@ -9,10 +9,8 @@
     \/_/                                                  \/__/ 
 
 Phutility is a collection of tools to make life in php more livable. 
-Initially this means Invokable which is a utlity for creating simple 
-callbacks w/o having to define a function. 
-
-i.e. 
+Initially this means Invokable which is a utility for creating simple 
+callbacks w/o having to define a function.
 
 $collection->map(function($i) use($var1, $var2) { 
     return $i->someMethod()->someOther($var1)->someOther($var2);
@@ -40,3 +38,27 @@ Which is equivelant to:
 $y->someMethod(30)->secondMethod($arg2);
 $z->someMethod(30)->secondMethod($arg2);
 
+Obj is an alternative object model based more upon self (http://selflanguage.org/).
+You can create new objects:
+
+use Phutility\Obj;
+
+$obj = Obj::create(
+	'age', 30, 
+	'name', 'peter',
+	'sayWord', function($self, $word) {
+		echo "{$self->name} says {$word}";
+	}
+);
+
+You can access any of the slots like a normal object:
+$obj->age += 40; 
+$obj->sayWord("carrot");
+
+You can "mixin" or "extend" and object by adding a parent like:
+
+$obj->addParent(Obj::create(
+	'doubleAgePlus', function($self, $plus) {
+		return ($self->age * 2) + $plus;
+	})
+);
