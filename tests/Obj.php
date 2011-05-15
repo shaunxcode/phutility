@@ -121,12 +121,14 @@ function createTableObject($name, $fields) {
 		$obj->{'get' . ucfirst($field)} = $buildGetter($field);
 		$obj->{'set' . ucfirst($field)} = $buildSetter($field);
 	}
-	
-	return $obj;
+
+	return function($data) use($obj) { 
+		return $obj('data', $data);
+	};
 }
 
 $color = createTableObject('Color', array('name' => 'String', 'hex' => 'String'));
-$red = $color('data', array('name' => 'Red', 'hex' => '#ff0000'));
+$red = $color(array('name' => 'Red', 'hex' => '#ff0000'));
 
 Test::assert('table name is correct', $red->table, 'Color');
 Test::assert('higher order object slot', $red->getName(), 'Red');

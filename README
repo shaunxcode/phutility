@@ -64,7 +64,7 @@ $obj->addParent(Obj::create(
 You can also add multiple parents at once:
 $obj->addParents($parent1, $parent2);
 
-You can "clone" an object, which essentially how you create an instance in normal oo terms. 
+You can "clone" an object, which is essentially how you create an instance in normal oo terms. 
 You can over-ride any properties that you want when creating a clone. 
 
 $otherObj = $obj('age', 40);
@@ -84,7 +84,7 @@ for each field.
 function createTableObject($name, $fields) {
 	$obj = Obj::create(
 		'table', $name,
-	    'data', array(),
+		'data', array(),
 		'types', array());
 	
 	$buildGetter = function($fname) { 
@@ -106,11 +106,13 @@ function createTableObject($name, $fields) {
 		$obj->{'set' . ucfirst($field)} = $buildSetter($field);
 	}
 	
-	return $obj;
+	return function($data) use($obj) { 
+		return $obj('data', $data);
+	};
 }
 
 $color = createTableObject('Color', array('name' => 'String', 'hex' => 'String'));
-$red = $color('data', array('name' => 'Red', 'hex' => '#ff0000'));
+$red = $color(array('name' => 'Red', 'hex' => '#ff0000'));
 
 echo $red->getName();
 echo $red->setHex('#ff00ff')->getHex();
