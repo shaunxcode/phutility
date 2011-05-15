@@ -6,38 +6,46 @@ class Obj {
     private $parents = array();
 
 	public static function create() {
-	    $slots = array();
-	    $args = func_get_args();
-
-	    while(!empty($args)) {
-	        $key = array_shift($args);
-	        $val = array_shift($args);
-	        if(!defined($key)) { 
-	            define($key, $key);
-	        }
-	        $slots[$key] = $val;
-	    }
-
-	    return new Obj($slots);
+	    return new Obj(func_get_args());
 	}
 	
-    public function __construct($slots) {
-        $this->slots = $slots;
+    public function __construct($slots, $initSlots = array()) {
+		$this->slots = $initSlots;
+		while(!empty($slots)) {
+	        $key = array_shift($slots);
+	        $val = array_shift($slots);
+	        $this->slots[$key] = $val;
+	    }
     }
 
+	public function __invoke() {
+		$new = new Obj(func_get_args(), $this->slots);
+		call_user_func_array(array($new, 'addParents'), $this->parents);
+		return $new;
+	}
+	
     public function addParent($parent) {
         $this->parents[] = $parent;
 		return $this;
     }
 
-    public function getSlot($slot) {
+	public function addParents() {
+		foreach(func_get_args() as $parent) {
+			$this->parents[] = $parent;
+		}
+		return $this;
+	}
+
+    public function &getSlot($slot) {
         if(isset($this->slots[$slot])) {
-            return $this->slots[$slot];
+            $ret = &$this->slots[$slot];
+			return $ret;
         }
 
         foreach($this->parents as $parent) {
             if(!is_null($result = $parent->$slot)) {
-                return $result;
+                $ret = &$result;
+				return $ret;
             }
         }
 
@@ -49,8 +57,9 @@ class Obj {
         return $this;
     }
 
-    public function __get($slot) {
-        return $this->getSlot($slot);
+    public function &__get($slot) {
+        $ret = &$this->getSlot($slot);
+		return $ret;
     }
 
     public function __set($slot, $val) {

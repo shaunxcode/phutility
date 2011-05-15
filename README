@@ -55,10 +55,61 @@ You can access any of the slots like a normal object:
 $obj->age += 40; 
 $obj->sayWord("carrot");
 
-You can "mixin" or "extend" and object by adding a parent like:
+You can "mixin" or "extend" an object by adding a parent:
 
 $obj->addParent(Obj::create(
 	'doubleAgePlus', function($self, $plus) {
 		return ($self->age * 2) + $plus;
 	})
 );
+
+You can also add multiple parents at once:
+$obj->addParents($parent1, $parent2);
+
+You can "clone" an object, which essentially how you create an instance in normal oo terms. 
+You can over-ride any properties that you want when creating a clone. 
+
+$otherObj = $obj('age', 40);
+
+The larger question is obviously "why". Well, mainly to explore the limits of class-less oo. 
+There is a decent potential for cool meta-programming as well. The fact that you can pass 
+around these objects as if they are normal php objects is advantageous in that it does not 
+limit you to staying with in the confines of Phutility\Obj. 
+
+With the Obj approach higher order oo is possible. i.e. functions which return objects 
+based upon runtime values. Previously in php this was only possible by massively abusing
+__call and other magic methods or by the use of eval, code generation etc. 
+
+Imagine you want to have an object which represents a table row and has getter/setters
+for each field. 
+
+function createTableObject($name, $fields) {
+	$obj = Obj::create(
+		'table', $name,
+	    'data', array(),
+		'types', array());
+	
+	$buildGetter = function($fname) { 
+		return function($self) use($fname) { 
+			return $self->data[$fname];
+		};
+	};
+	
+	$buildSetter = function($fname) {
+		return function($self, $value) use($fname) {
+			$self->data[$fname] = $value;
+			return $self;
+		};
+	};
+	
+	foreach($fields as $field => $type) {
+		$obj->types[$field] = getType($type);
+		$obj->{'get' . ucfirst($field)} = $buildGetter($field);
+		$obj->{'set' . ucfirst($field)} = $buildSetter($field);
+	}
+	
+	return $obj;
+}
+
+$color = createTableObject('Color', array('name' => 'String', 'hex' => 'String'));
+$red = $color('data', array('name' => 'Red', 'hex' => '#ff0000'));
