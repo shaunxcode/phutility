@@ -128,8 +128,10 @@ function createTableObject($name, $fields) {
 $color = createTableObject('Color', array('name' => 'String', 'hex' => 'String'));
 $red = $color('data', array('name' => 'Red', 'hex' => '#ff0000'));
 
-Test::assert('Test table name is correct', $red->table, 'Color');
-Test::assert('Test higher order object slot', $red->getName(), 'Red');
-Test::assert('Test higher order setter', $red->setName('Crimson')->getName(), 'Crimson'); 
+Test::assert('table name is correct', $red->table, 'Color');
+Test::assert('higher order object slot', $red->getName(), 'Red');
+Test::assert('higher order setter', $red->setName('Crimson')->getName(), 'Crimson'); 
 
+Test::assert('instantiated w/ array', Obj::create(array('a' => 'b', 'c' => 'd'))->a, 'b');
+Test::assert('instantiated w/o array', Obj::create('a', 'b', 'c', 'd')->a, 'b');
 Test::totals();

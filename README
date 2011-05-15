@@ -1,12 +1,10 @@
-       __               __         ___        __                
-      /\ \             /\ \__  __ /\_ \    __/\ \__             
- _____\ \ \___   __  __\ \ ,_\/\_\\//\ \  /\_\ \ ,_\  __  __    
-/\ '__`\ \  _ `\/\ \/\ \\ \ \/\/\ \ \ \ \ \/\ \ \ \/ /\ \/\ \   
-\ \ \L\ \ \ \ \ \ \ \_\ \\ \ \_\ \ \ \_\ \_\ \ \ \ \_\ \ \_\ \  
- \ \ ,__/\ \_\ \_\ \____/ \ \__\\ \_\/\____\\ \_\ \__\\/`____ \ 
-  \ \ \/  \/_/\/_/\/___/   \/__/ \/_/\/____/ \/_/\/__/ `/___/> \
-   \ \_\                                                  /\___/
-    \/_/                                                  \/__/ 
+ ____     __  __   __  __   ______  ______   __     ______  ______  __    __ 
+/\  _`\  /\ \/\ \ /\ \/\ \ /\__  _\/\__  _\ /\ \   /\__  _\/\__  _\/\ \  /\ \
+\ \ \L\ \\ \ \_\ \\ \ \ \ \\/_/\ \/\/_/\ \/ \ \ \  \/_/\ \/\/_/\ \/\ `\`\\/'/
+ \ \ ,__/ \ \  _  \\ \ \ \ \  \ \ \   \ \ \  \ \ \  __\ \ \   \ \ \ `\ `\ /' 
+  \ \ \/   \ \ \ \ \\ \ \_\ \  \ \ \   \_\ \__\ \ \L\ \\_\ \__ \ \ \  `\ \ \ 
+   \ \_\    \ \_\ \_\\ \_____\  \ \_\  /\_____\\ \____//\_____\ \ \_\   \ \_\
+    \/_/     \/_/\/_/ \/_____/   \/_/  \/_____/ \/___/ \/_____/  \/_/    \/_/
 
 Phutility is a collection of tools to make life in php more livable. 
 Initially this means Invokable which is a utility for creating simple 
@@ -113,3 +111,19 @@ function createTableObject($name, $fields) {
 
 $color = createTableObject('Color', array('name' => 'String', 'hex' => 'String'));
 $red = $color('data', array('name' => 'Red', 'hex' => '#ff0000'));
+
+echo $red->getName();
+echo $red->setHex('#ff00ff')->getHex();
+
+The real point is that it looks like an object and acts like an object yet we can
+add new methods at any time. Say we want to allow saving of the object via some sort
+of entity manager. 
+
+$red->entityManager = $em;
+$red->save = function($self) {
+	$self->entityManager->persist($self->data);
+	$self->entityManager->flush();
+	return $self;
+};
+
+$red->save();

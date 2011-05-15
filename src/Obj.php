@@ -11,11 +11,18 @@ class Obj {
 	
     public function __construct($slots, $initSlots = array()) {
 		$this->slots = $initSlots;
-		while(!empty($slots)) {
-	        $key = array_shift($slots);
-	        $val = array_shift($slots);
-	        $this->slots[$key] = $val;
-	    }
+
+		if(count($slots) == 1 && is_array(current($slots))) {
+			foreach(current($slots) as $key => $val) { 
+				$this->slots[$key] = $val;
+			}
+		} else {
+ 			while(!empty($slots)) {
+		        $key = array_shift($slots);
+		        $val = array_shift($slots);
+		        $this->slots[$key] = $val;
+	    	}
+		}
     }
 
 	public function __invoke() {
