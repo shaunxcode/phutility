@@ -205,6 +205,4 @@ $myAccount->withdraw(200);
 
 Test::assert('account balance is 800 after withdraw', $myAccount->balance, 800);
 
-print_r($myAccount->transactions);
-
 Test::totals();
