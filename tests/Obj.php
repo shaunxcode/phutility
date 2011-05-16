@@ -39,7 +39,7 @@ $guy->weight += 50;
 Test::assert("Test increment by 50", $guy->weight, 81); 
 
 $guy->getAgePlusYears = function($self, $years) {
-    return $self->age + ($years * 2); 
+	return $self->age + ($years * 2); 
 };
 
 Test::assert("Overload slot method", $guy->getAgePlusYears(300), 1100); 
@@ -138,5 +138,73 @@ Test::assert('higher order setter', $red->setName('Crimson')->getName(), 'Crimso
 
 Test::assert('instantiated w/ array', Obj::create(array('a' => 'b', 'c' => 'd'))->a, 'b');
 Test::assert('instantiated w/o array', Obj::create('a', 'b', 'c', 'd')->a, 'b');
+
+$hello = Obj::create('sayHello', function() { return 'Hello '; }); 
+$world = Obj::create('sayWorld', function() { return 'World'; });
+$myHelloWorld = Obj::create('sayExclamationMark', function() { return '!'; })->addParents($hello, $world);
+$o = $myHelloWorld();
+
+Test::assert('Traits test', $o->sayHello() . $o->sayWorld() . $o->sayExclamationMark(), 'Hello World!');
+
+$hello->monkeyTime = function() { return 'pound the keys!'; };
+
+Test::assert("Parent mixin new func w/ child calling", $o->monkeyTime(), 'pound the keys!'); 
+
+
+$Transaction = obj::create(
+	'priorBalance', 0, 
+	'change', 0,
+	'newBalance', 0,
+	'time', 0);
+
+$BankAccount = obj::create(
+	'balance', 0, 
+	'transactions', array(),
+	'withdraw', function($self, $amount) use($Transaction) { 
+		if($self->balance >= $amount) {
+			$t = $Transaction(
+				'priorBalance', $self->balance, 
+				'change', -$amount,
+				'time', time());
+				
+			$self->balance -= $amount;
+			$t->newBalance = $self->balance;
+			
+			$self->transactions[] = $t;
+		} else {
+			throw new \Exception('Balance not high enough');
+		}
+		
+		return $self;
+	},
+	'deposit', function($self, $amount) use($Transaction) {
+		$t = $Transaction(
+			'priorBalance', $self->balance,
+			'change', $amount,
+			'time', time());
+			
+		$self->balance += $amount;
+		$t->newBalance = $self->balance;
+		
+		$self->transactions[] = $t;
+		
+		return $self;
+	});
+
+$myAccount = $BankAccount(
+	'balance', 500, 
+	'transactions', array());
+
+Test::assert('account balance is 500', $myAccount->balance, 500); 
+
+$myAccount->deposit(500);
+
+Test::assert('account balance is 1000 after deposit', $myAccount->balance, 1000);
+
+$myAccount->withdraw(200);
+
+Test::assert('account balance is 800 after withdraw', $myAccount->balance, 800);
+
+print_r($myAccount->transactions);
 
 Test::totals();

@@ -6,9 +6,10 @@
    \ \_\    \ \_\ \_\\ \_____\  \ \_\  /\_____\\ \____//\_____\ \ \_\   \ \_\
     \/_/     \/_/\/_/ \/_____/   \/_/  \/_____/ \/___/ \/_____/  \/_/    \/_/
 
-Phutility is a collection of tools to make life in php more livable. 
-
-![Truth](http://30.media.tumblr.com/tumblr_l3wek2i9FK1qzev6go1_400.jpg "Truth")
+Phutility is a collection of tools to make life in php more livable. Primarily
+it is meant to scratch the itch of a beaver who want's to play guitar but is 
+stuck trying to play keyboard whilst pretending to be a duck 9-5. 
+http://30.media.tumblr.com/tumblr_l3wek2i9FK1qzev6go1_400.jpg
 
 Invokable is a utility for creating simple callbacks when dealing w/ objects.
 
