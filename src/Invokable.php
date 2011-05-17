@@ -41,7 +41,17 @@ class Invokable {
         return $new;
     }
 
-    public function __invoke($result) { 
+    public function __invoke() { 
+    	$iargs = func_get_args();
+    	if(is_object(current($iargs))) {
+            $result = current($iargs);
+    	}
+    	else if(is_object(end($iargs))) {
+            $result = end($iargs);
+    	}
+    	else {
+            throw new \Exception('Expects that either arg1 or arg2 is the object to be invoked upon.');
+    	}
         foreach($this->stack as $method => $args) {
             $result = is_null($args) ? $result->$method : call_user_func_array(array($result, $method), $args);
         }
