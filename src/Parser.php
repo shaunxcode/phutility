@@ -3,7 +3,7 @@
 namespace Phutility;
 
 class Parser {
-	public static function subExpressions($chars, $brackets = array('(' => ')')) {
+	public static function subExpressions($chars, $callback = false, $brackets = array('(' => ')')) {
 		$tree = array();
 
 		if(is_string($chars)) {
@@ -13,16 +13,17 @@ class Parser {
 				
 			$chars = explode(
 				' ', 
-				str_replace(
-					$flatBrackets, 
-					array_map(
-						function($i) { return " $i "; }, 
-						$flatBrackets), 
-					$chars));
+				preg_replace('/\s+/', ' ',
+					str_replace(
+						$flatBrackets, 
+						array_map(
+							function($i) { return " $i "; }, 
+							$flatBrackets), 
+						$chars)));
 		}
 
 		foreach($chars as $char) {
-			if(empty($char)) {
+			if($char == ' ') {
 				continue;
 			}
 			 
@@ -46,7 +47,7 @@ class Parser {
 				if($count) {
 					$branch[] = $char;
 				} else {
-					$tree[] = Parser::subExpressions($branch);
+					$tree[] = Parser::subExpressions($branch, $callback, $brackets);
 					unset($branch);
 					unset($count);
 				} 
@@ -56,6 +57,6 @@ class Parser {
 			$tree[] = $char;
 		}
 
-		return $tree;
+		return $callback($tree);
 	}
 }

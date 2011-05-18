@@ -4,7 +4,7 @@ namespace Phutility;
 class Node {
 	protected $_type;
 	protected $_vals;
-	public function __construct($type, $vals) {
+	public function __construct($type, $vals = array()) {
 		$this->_type = $type;
 		$this->_vals = $vals;
 	}
@@ -83,5 +83,18 @@ class Node {
 	public function add($node) {
 		$this->_vals[] = $node;
 		return $this;
+	}
+	
+	public function toArray() {
+		$array = array();
+		foreach($this->_vals as $val) { 
+			if($val instanceof Node) {
+				$array[] = array($val->getType() => $val->toArray());
+			} else { 
+				$array[] = is_scalar($val) ? $val : (array)$val;
+			}
+		}
+
+		return $array;
 	}
 }

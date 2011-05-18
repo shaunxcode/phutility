@@ -14,9 +14,7 @@ class Test {
 		return chr(27) . self::$colors[$color] . $text;
 	}
 	
-	public static function assert($description, $val, $isVal = true) {
-		$pass = $val == $isVal;
-				
+	private static function outputResult($description, $val, $isVal, $pass = false) {
 		if($pass) { 
 			self::$passCount++;
 		} else {
@@ -24,11 +22,30 @@ class Test {
 		}
 		
 		echo self::text('white', $description . ' [' 
-		   . self::text($pass ? 'green' : 'red', $pass ? 'PASS' : 'FAIL [expected: ' . json_encode($isVal) . ' | got: ' . json_encode($val)  . ']'))
+		   . self::text($pass ? 'green' : 'red', $pass ? 'PASS' : 'FAIL [expected: ' 
+				. json_encode(is_callable(array($isVal, 'toArray')) ? $isVal->toArray() : $val) 
+				. ' | got: ' 
+				. json_encode(is_callable(array($val, 'toArray')) ? $val->toArray() : $val)  
+				. ']'))
 		   . self::text('white', ']') 
 		   . self::text('normal', "\n");
 			
-		return $pass;
+		return $pass;		
+	}
+	
+	public static function assert($description, $val, $isVal = true) {
+		return self::outputResult($description, $val, $isVal, $val == $isVal);
+	}
+	
+	public static function throwsException($description, $func, $exception = '\Exception') {
+		$result = false;
+		try { 
+			$func();
+		} catch (\Exception $e) {
+			$result = true;
+		}
+		return self::outputResult($description, "[closure]", $exception, $result); 
+		
 	}
 	
 	public static function totals() {
