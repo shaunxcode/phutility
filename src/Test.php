@@ -24,7 +24,7 @@ class Test {
 		}
 		
 		echo self::text('white', $description . ' [' 
-		   . self::text($pass ? 'green' : 'red', $pass ? 'PASS' : 'FAIL'))
+		   . self::text($pass ? 'green' : 'red', $pass ? 'PASS' : 'FAIL [expected: ' . json_encode($isVal) . ' | got: ' . json_encode($val)  . ']'))
 		   . self::text('white', ']') 
 		   . self::text('normal', "\n");
 			
@@ -35,5 +35,15 @@ class Test {
 		echo self::text('green', 'Total Passed: ' . self::$passCount) . "\n" 
 		   . self::text('red', 'Total Failed: ' . self::$failCount) 
 		   . self::text('normal', "\n"); 
+	}
+	
+	public static function runAll() {
+		foreach(glob('*Test.php') as $file) {
+			echo self::text('white', "Test $file\n\n"); 
+			require_once $file;
+			echo "\n";
+		}
+		
+		self::totals();
 	}
 }
