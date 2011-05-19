@@ -23,7 +23,7 @@ class Test {
 		
 		echo self::text('white', $description . ' [' 
 		   . self::text($pass ? 'green' : 'red', $pass ? 'PASS' : 'FAIL [expected: ' 
-				. json_encode(is_callable(array($isVal, 'toArray')) ? $isVal->toArray() : $val) 
+				. json_encode(is_callable(array($isVal, 'toArray')) ? $isVal->toArray() : $isVal) 
 				. ' | got: ' 
 				. json_encode(is_callable(array($val, 'toArray')) ? $val->toArray() : $val)  
 				. ']'))

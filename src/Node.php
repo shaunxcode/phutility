@@ -1,6 +1,8 @@
 <?php
 namespace Phutility;
 
+use Phutility\Invokable as I;
+
 class Node {
 	protected $_type;
 	protected $_vals;
@@ -28,11 +30,24 @@ class Node {
 		return end($this->_vals);
 	}
 	
+	public function prior() {
+		return array_slice($this->_vals, 0, -1);
+	}
+	
 	public function nth($n) {
 		if(isset($this->_vals[$n])) {
 			return $this->_vals[$n];
 		} else {
 			throw new \Exception("index {$n} does not exist! Only contains indexes[0.." . (count($this->_vals) - 1). ']');
+		}
+	}
+	
+	public function each($func) {
+		foreach($this->_vals as &$val) {
+			$result = $func($val);
+			if(!is_null($result)) {
+				$val = $result;
+			}
 		}
 	}
 	
@@ -60,8 +75,27 @@ class Node {
 		throw new \Exception('No elements found which match closure');
 	}
 
+	public function all($func = false) {
+		return $func ? array_filter($this->_vals, $func) : $this->_vals;
+	}
+	
+	public function allOfType($type) {
+		return $this->all(I::isType($type));
+	}
+	
+	public function is($val) {
+		return $this->_vals == $val;
+	}
+	
 	public function has($type) {
 		foreach($this->_vals as $val) {
+			if($type instanceof \Closure) {
+				if($type($val)) { 
+					return true;
+				} else {
+					continue;
+				}
+			}
 			if($val instanceof Node && $val->isType($type)) {
 				return $val;
 			}
@@ -80,8 +114,15 @@ class Node {
 		return $this->_type == $type;
 	}
 	
-	public function add($node) {
-		$this->_vals[] = $node;
+	public function add() {
+		$vals = func_get_args();
+		if(count($vals) == 1 && is_array(current($vals))) {
+			$vals = current($vals);
+		}
+		
+		foreach($vals as $node) {
+			$this->_vals[] = $node;
+		}
 		return $this;
 	}
 	
