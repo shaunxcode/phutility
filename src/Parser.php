@@ -23,7 +23,7 @@ class Parser {
 		}
 
 		foreach($chars as $char) {
-			if($char == ' ') {
+			if($char == ' ' || $char == '') {
 				continue;
 			}
 			 
@@ -57,6 +57,6 @@ class Parser {
 			$tree[] = $char;
 		}
 
-		return $callback($tree);
+		return $callback ? $callback($tree) : $tree;
 	}
 }
