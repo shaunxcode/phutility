@@ -27,3 +27,15 @@ Test::throwsException("2nd param must be closure", function() { F::rest(1, 'appl
 Test::throwsException("1st param must be int, pass float", function() { F::rest(1.3, function(){});});
 
 Test::throwsException("1st param must be int, pass string", function() { F::rest('donkey', function(){});});
+
+$func4 = F::options(function($options) {
+	return $options;
+});
+
+test::assert("options passes through", $func4('name', 'peter', 'age', 13), array('name' => 'peter', 'age' => 13));
+
+$func5 = F::options(2, function($age, $weight, $options) {
+	return array('age' => $age, 'weight' => $weight, 'options' => $options);
+});
+
+test::assert("extra params", $func5(5, 500, 'name', 'peter', 'hair', 'red'), array('age' => 5, 'weight' => 500, 'options' => array('name' => 'peter', 'hair' => 'red')));
