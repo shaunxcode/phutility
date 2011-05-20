@@ -16,7 +16,7 @@ $funk = function() {
 
 Test::assert("from func_get_args", $funk('a', 1, 'b', 2), array('a' => 1, 'b' => 2));
 
-$funk2 = F::rest(2, function($a, $b, $options) { 
+$funk2 = F::rest(function($a, $b, $options) { 
 	return A::create($options);
 });
 

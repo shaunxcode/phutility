@@ -39,104 +39,37 @@ Which is equivalent to:
 $y->someMethod(30)->secondMethod($arg2);
 $z->someMethod(30)->secondMethod($arg2);
 
-Obj is an alternative/classless object model based more upon self (http://selflanguage.org/).
+Appos is useful for when you want to do things that would previously require
+passing around associative arrays i.e.
 
-Create a new object:
-
-use Phutility\Obj;
-
-$obj = Obj::create(
-	'age', 30, 
-	'name', 'peter',
-	'sayWord', function($self, $word) {
-		echo "{$self->name} says {$word}";
-	}
-);
-
-You can access any of the slots like a normal object:
-$obj->age += 40; 
-$obj->sayWord("carrot");
-
-You can "mixin" or "extend" an object by adding a parent:
-
-$obj->addParent(Obj::create(
-	'doubleAgePlus', function($self, $plus) {
-		return ($self->age * 2) + $plus;
-	})
-);
-
-You can add multiple parents at once:
-$obj->addParents($parent1, $parent2);
-
-You can "clone" an object, which is essentially how you create an instance in "classful" oo terms. 
-You can over-ride any properties that you want when creating a clone. 
-
-$otherObj = $obj('age', 40);
-
-The larger question is obviously "why"? Well, mainly to explore the limits of class-less oo. 
-There is a decent potential for cool meta-programming as well. The fact that you can pass 
-around these objects as if they are normal php objects is advantageous in that it does not 
-limit you to staying with in the confines of Phutility\Obj. 
-
-With the Obj approach higher order oo is possible. i.e. functions which return objects 
-based upon runtime values. Previously in php this was only possible by massively abusing
-__call and other magic methods or by the use of eval, code generation etc. 
-
-Imagine you want to have an object which represents a table row and has getter/setters
-for each field. 
-
-function createTableObject($name, $fields) {
-	$obj = Obj::create(
-		'table', $name,
-		'data', array(),
-		'types', array());
-	
-	$buildGetter = function($fname) { 
-		return function($self) use($fname) { 
-			return $self->data[$fname];
-		};
-	};
-	
-	$buildSetter = function($fname) {
-		return function($self, $value) use($fname) {
-			$self->data[$fname] = $value;
-			return $self;
-		};
-	};
-	
-	foreach($fields as $field => $type) {
-		$obj->types[$field] = getType($type);
-		$obj->{'get' . ucfirst($field)} = $buildGetter($field);
-		$obj->{'set' . ucfirst($field)} = $buildSetter($field);
-	}
-	
-	return function($data) use($obj) { 
-		return $obj('data', $data);
-	};
-}
-
-$color = createTableObject('Color', array('name' => 'String', 'hex' => 'String'));
-$red = $color(array('name' => 'Red', 'hex' => '#ff0000'));
-
-echo $red->getName();
-echo $red->setHex('#ff00ff')->getHex();
-
-It is important to note that it looks like an object and acts like an object yet we can
-add new methods at any time. Say we want to allow saving of the object via some sort
-of entity manager. 
-
-$red->entityManager = $em;
-$red->save = function($self) {
-	$self->entityManager->persist($self->data);
-	$self->entityManager->flush();
-	return $self;
+$f = function($options) { 
+	echo $options['name'] . " is " . $options['age'];
 };
 
-$red->save();
+$f(array('name' => 'peter', 'age' => 50));
 
-As you can see it would be relatively trivial to modify the createTableObject to build
-in validation inside of the setter etc.
+Can now be: 
+$f = function($options) { 
+	$options = Appos::create($options);
+	echo $options['name'] . " is " . $optjons['age'];
+};
 
-The Obj class is essentially a meta-object-protocol in that multiple inheritance behavior,
-method dispatch etc. can be customized. One could extend Obj and over-ride the getSlot 
-method to behave in any way that you would like. 
+$f('name', 'peter', 'age', 50);
+
+Or even better you can use a higher order function like options or rest: 
+
+use Phutility\Func as F;
+
+Func gives us even more sugar:
+$f = F::options(function($options) {
+....
+});
+
+Rest args are fun too:
+$f = F::rest(function($a, $b, $rest) {
+	echo "a is $a with b of $b and " . json_encode($rest);
+});
+
+$f($obj1, $obj2, 
+	'sortBy', 'col1', 
+	'sortDir', 'desc');

@@ -54,13 +54,19 @@ class Test {
 		   . self::text('normal', "\n"); 
 	}
 	
-	public static function runAll() {
+	public static function runAll() {		
+		$start = microtime();
 		foreach(glob('*Test.php') as $file) {
 			echo self::text('white', "Test $file\n\n"); 
+			$substart = microtime();
 			require_once $file;
-			echo "\n";
+			$subend = microtime();
+			echo self::text('white', 'Test Time: ' . ($subend - $substart) . "\n\n");
 		}
 		
 		self::totals();
+		$end = microtime();
+		echo self::text('white', 'Total Time: ' . ($end - $start))
+		    .self::text('normal', "\n"); 
 	}
 }

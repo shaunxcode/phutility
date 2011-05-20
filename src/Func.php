@@ -3,22 +3,20 @@
 namespace Phutility;
 
 class Func {
-	public static function rest($num, $func, $transform = false) {
-		if(!is_int($num)) {
-			throw new \Exception('1st param must be an integer');
-		}
-		
+	public static function rest($func, $transform = false) {		
 		if(!$func instanceof \Closure) {
-			throw new \Exception('2nd param must be a closure');
+			throw new \Exception('1st param must be a closure');
 		}
 		
 		if(!$transform) { 
 			$transform = function($i) { return $i; };
 		}
 		
+		$num = self::arity($func) - 1;
+		
 		return function() use($num, $func, $transform) {
 			$args = func_get_args();
-			
+
 			if(count($args) < $num) { 
 				throw new \Exception("Not enough arguments. Expected $num got " . count($args));
 			}
@@ -30,17 +28,13 @@ class Func {
 					array($transform(array_slice($args, $num)))));
 		};
 	}
-	
-	public static function options() {
-		$args = func_get_args();
 
-		if(count($args) == 1 && current($args) instanceof \Closure) {
-			$num = 0;
-			$func = current($args);
-		} else if(count($args) == 2) {
-			list($num, $func) = $args;
-		}
-		
-		return Func::rest($num, $func, function($i) { return Appos::create($i); });
+	public static function arity($func) {
+	    $r = new \ReflectionObject($func);
+	    return $r->getMethod('__invoke')->getNumberOfParameters();
+	}
+	
+	public static function options($func) {		
+		return Func::rest($func, function($i) { return Appos::create($i); });
 	}
 }
