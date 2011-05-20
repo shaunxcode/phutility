@@ -42,6 +42,8 @@ $keyword = F::keyword(function($age, $eyeColor) {
 
 test::assert("keyword args normal", $keyword(age, 25, eyeColor, 'blue'), array('age' => 25, 'eyeColor' => 'blue'));
 test::assert("keyword args reversed", $keyword(eyeColor, 'blue', age, 25), array('age' => 25, 'eyeColor' => 'blue'));
+test::throwsException("wrong arg number", function() use($keyword) { $keyword(eyeColor, 'blue');});
+test::throwsException("misnamed keyword", function() use($keyword) { $keyword(eyeBolor, 'blue', age, 35);});
 
 $argsFunc = F::args(function($args) { 
 	return $args;
@@ -68,7 +70,7 @@ test::assert("Match Square", $multi(new Square), "MATCHED SQUARE");
 test::assert("Match Circle Square", $multi(new Circle, new Square), "MATCHED CIRCLE SQUARE");
 
 $fact = F::match(
-	0, function() { return 1;},
-	F::x, function($x) use(&$fact) { return $x * $fact($x - 1);});
-	
+	0, function() { return 1; },
+	F::x, function($x) use(&$fact) { return $x * $fact($x - 1); });
+
 test::assert("factorial works", $fact(5), 120);

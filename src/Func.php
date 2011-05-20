@@ -61,6 +61,10 @@ class Func {
 		}
 		
 		return self::options(function($args) use($func, $kwlist) {
+			if(count($args) !== count($kwlist)) {
+				throw new \Exception("Expected keyword list of " . json_encode(array_keys($kwlist)));
+			}
+			
 			foreach($kwlist as $key => $val) {
 				if(!isset($args[$key])) {
 					throw new \Exception("Expect $key but was not found in " . json_encode(array_keys($args)));
@@ -124,6 +128,13 @@ class Func {
 	}
 	
 	public static function match() {
+		$matches = array();
+		
+		$match = array();
+		foreach(func_get_args() as $arg) {
+			
+		}
+		
 		return function() {};
 	}
 }
