@@ -69,8 +69,53 @@ $multi = F::matchType(
 test::assert("Match Square", $multi(new Square), "MATCHED SQUARE");
 test::assert("Match Circle Square", $multi(new Circle, new Square), "MATCHED CIRCLE SQUARE");
 
-$fact = F::match(
-	0, function() { return 1; },
-	F::x, function($x) use(&$fact) { return $x * $fact($x - 1); });
+class KeywordArgs {
+	private $funcs = array();
+	
+	public function addMethod($selector, $func) {
+		$this->funcs[$selector] = $func;
+		return $this;
+	}
+	
+	public function __invoke() {
+		$args = func_get_args();
+		if(count($args) == 1 && isset($this->funcs[current($args)])) {
+			return call_user_func_array($this->funcs[current($args)], array($this));
+		}
+		
+		$arglist = \Phutility\Appos::create($args);
 
-test::assert("factorial works", $fact(5), 120);
+		$selector = implode(':', array_keys($arglist));
+		if(isset($this->funcs[$selector])) {
+			array_unshift($arglist, $this);
+			return call_user_func_array($this->funcs[$selector], array_values($arglist));
+		} else {
+			throw new \Exception("No selector $selector. " . 'Has ' . implode("\n", array_keys($this->funcs)));
+		}
+	}
+	
+	public function _() {
+		return call_user_func_array(array($this, '__invoke'), func_get_args());
+	}
+}
+
+$person = new KeywordArgs;
+$person
+	->addMethod('ifEyeColorIs:setHairToColor', function($self, $eyeColor, $hairColor) {
+		return $self;
+	})
+	->addMethod('setAddressTo:city:state', function($self, $line1, $city, $state) {
+		$self->address = "$line1\n$city,$state";
+		return $self;
+	})
+	->addMethod('getAddress', function($self) {
+		return $self->address;
+	});
+	
+$person(ifEyeColorIs, 'blue', setHairToColor, 'blonde')
+	->_(setAddressTo, '364 North 800 East', city, 'Orem', state, 'Utah')
+	->_(getAddress);
+
+test::assert("keyword magic obj arg is set", $person(getAddress), "364 North 800 East\nOrem,Utah");
+
+	

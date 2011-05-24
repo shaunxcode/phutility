@@ -73,3 +73,13 @@ $f = F::rest(function($a, $b, $rest) {
 $f($obj1, $obj2, 
 	'sortBy', 'col1', 
 	'sortDir', 'desc');
+	
+Keyword args are super cool:
+
+$keywrodFunc = F::keyword(function($name, $age) {
+
+});
+
+$keywordFunc(
+	age, 34,
+	name, 'peter jensen');
