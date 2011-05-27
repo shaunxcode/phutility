@@ -76,7 +76,7 @@ $f($obj1, $obj2,
 	
 Keyword args are super cool:
 
-$keywrodFunc = F::keyword(function($name, $age) {
+$keywordFunc = F::keyword(function($name, $age) {
 
 });
 
