@@ -2,12 +2,13 @@
 
 namespace Phutility;
 
+class RequiredArg{}
+		
 class Func {
 	const x = 'wildcard';
 	
 	public static function reflect($func) {
-		$r = new \ReflectionObject($func);
-		return $r->getMethod('__invoke');
+		return new \ReflectionFunction($func);
 	}
 	
 	public static function arity($func) {
@@ -56,22 +57,24 @@ class Func {
 		
 	public static function keyword($func) {
 		$kwlist = array();
-		foreach(self::getParameters($func) as $arg) {
-			$kwlist[$arg->name] = false;
+		foreach(self::getParameters($func) as $param) {
+			$kwlist[$param->getName()] = $param->isOptional() ? $param->getDefaultValue() : new RequiredArg;
 		}
 		
 		return self::options(function($args) use($func, $kwlist) {
-			if(count($args) !== count($kwlist)) {
-				throw new \Exception("Expected keyword list of " . json_encode(array_keys($kwlist)));
-			}
-			
-			foreach($kwlist as $key => $val) {
-				if(!isset($args[$key])) {
-					throw new \Exception("Expect $key but was not found in " . json_encode(array_keys($args)));
+			$callWith = array();
+			foreach($kwlist as $key => $default) {
+				if(isset($args[$key])) {
+					$callWith[] = $args[$key];
+				} else {
+					if($default instanceof RequiredArg) {
+						throw new \Exception("$key is a required keyword param");
+					} else {
+						$callWith[] = $default;
+					}
 				}
-				$kwlist[$key] = $args[$key];
 			}
-			return call_user_func_array($func, array_values($kwlist));
+			return call_user_func_array($func, $callWith);
 		});
 	}
 	

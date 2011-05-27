@@ -5,6 +5,7 @@ require_once '../src/Func.php';
 
 use Phutility\Test; 
 use Phutility\Func as F;
+use Phutility\Appos; 
 
 $func = F::rest(function($a, $b, $c, $rest) {
 	return $rest;
@@ -118,4 +119,36 @@ $person(ifEyeColorIs, 'blue', setHairToColor, 'blonde')
 
 test::assert("keyword magic obj arg is set", $person(getAddress), "364 North 800 East\nOrem,Utah");
 
-	
+function TestFunc($name, $eyes, $hair = 'blonde', $age = 0, $weight = 200, $goatFace = 'definitely') {
+	return array(
+		'name' => $name, 
+		'eyes' => $eyes, 
+		'hair' => $hair, 
+		'age' => $age, 
+		'weight' => $weight,
+		'goatFace' => $goatFace);
+}
+
+function TestFuncWrapper() {
+	static $wrapper; 
+	if(!$wrapper) {
+		$wrapper = F::keyword('\Phutility\Test\Func\TestFunc');
+	}
+
+	return call_user_func_array($wrapper, func_get_args());
+}
+
+test::assert(
+	"real function wrapper instead of var", 
+	TestFuncWrapper(
+		eyes, 'blue',
+		weight, 1200,
+		name, 'peter'),
+	array(
+		'name' => 'peter',
+		'eyes' => 'blue',
+		'hair' => 'blonde',
+		'age' => 0,
+		'weight' => 1200,
+		'goatFace' => 'definitely')
+);
