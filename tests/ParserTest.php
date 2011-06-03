@@ -87,7 +87,6 @@ Test::assert(
 
 $toPHP = function($ast, $level = 0) use(&$toPHP) {
 	$indent = str_repeat("\t", $level);
-	echo $indent . json_encode($ast) . "\n";
 	
 	if (is_scalar($ast)) {
 		if(is_numeric($ast)) {
@@ -108,11 +107,16 @@ $toPHP = function($ast, $level = 0) use(&$toPHP) {
 		return "call_user_func_array({$func}, array(" . implode(', ', $args) . '))';
 	}
 };
-/*
+
 test::assert("php translation", 
 	$toPHP($toAST(Parser::subExpressions($lexer("
 		obj(message: 3 restOfMessage: 6 subcall: func(arg1 arg2))
 		   (rest: of selector: var withDict: {a: b c:d})
 		   (nextSelector: of someSort: withArgs andAClosure: [_(msg: to anon:var_)])")))), 
 	array('apple'));
-	*.
+
+test::assert(
+	"soy",
+	$toPHP($toAST(Parser::subExpressions($lexer("
+		array-map(func {1 2 3 4})")))),
+	array());

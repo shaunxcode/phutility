@@ -34,6 +34,10 @@ class Node {
 		return array_slice($this->_vals, 0, -1);
 	}
 	
+	public function rest() {
+		return array_slice($this->_vals, 1);
+	}
+	
 	public function nth($n) {
 		if(isset($this->_vals[$n])) {
 			return $this->_vals[$n];
@@ -85,6 +89,10 @@ class Node {
 	
 	public function is($val) {
 		return $this->_vals == $val;
+	}
+	
+	public function filter($func) {
+		return array_filter($this->_vals, $func);
 	}
 	
 	public function has($type) {
